@@ -1,0 +1,42 @@
+package regkey
+
+import (
+	"fmt"
+	"log"
+
+	"golang.org/x/sys/windows/registry"
+)
+
+func KeyGDI() {
+	k, err := registry.OpenKey(registry.LOCAL_MACHINE, `SOFTWARE\Microsoft\Windows NT\CurrentVersion\windows`, registry.QUERY_VALUE)
+	if err != nil {
+		log.Fatal(err)
+	}
+	defer k.Close()
+
+	GDI := 20000
+	S, _, err := k.GetIntegerValue("GDIProcessHandleQuota")
+	if err != nil {
+		log.Fatal(err)
+	}
+	if S != uint64(GDI) {
+		Z, err := registry.OpenKey(registry.LOCAL_MACHINE, `SOFTWARE\Microsoft\Windows NT\CurrentVersion\windows`, registry.WRITE)
+		if err != nil {
+			log.Fatal(err)
+		}
+		Z.SetDWordValue("GDIProcessHandleQuota", uint32(GDI))
+		defer Z.Close()
+	}
+	t, err := registry.OpenKey(registry.LOCAL_MACHINE, `SOFTWARE\Microsoft\Windows NT\CurrentVersion\windows`, registry.QUERY_VALUE)
+	if err != nil {
+		log.Fatal(err)
+	}
+	defer t.Close()
+	ta, _, err := t.GetIntegerValue("GDIProcessHandleQuota")
+	if err != nil {
+		log.Fatal(err)
+	}
+	fmt.Printf("GDI was %v\n", S)
+	fmt.Printf("GDI was changed to %v\n", ta)
+
+}
