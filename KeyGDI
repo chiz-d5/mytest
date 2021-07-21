@@ -27,16 +27,11 @@ func KeyGDI() {
 		Z.SetDWordValue("GDIProcessHandleQuota", uint32(GDI))
 		defer Z.Close()
 	}
-	t, err := registry.OpenKey(registry.LOCAL_MACHINE, `SOFTWARE\Microsoft\Windows NT\CurrentVersion\windows`, registry.QUERY_VALUE)
-	if err != nil {
-		log.Fatal(err)
-	}
-	defer t.Close()
-	ta, _, err := t.GetIntegerValue("GDIProcessHandleQuota")
+	t, _, err := k.GetIntegerValue("GDIProcessHandleQuota")
 	if err != nil {
 		log.Fatal(err)
 	}
 	fmt.Printf("GDI was %v\n", S)
-	fmt.Printf("GDI was changed to %v\n", ta)
+	fmt.Printf("GDI was changed to %v\n", t)
 
 }
